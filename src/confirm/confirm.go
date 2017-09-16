@@ -3,7 +3,7 @@ package confirm
 import (
 	"fmt"
 	"strings"
-	"github.com/kevinkassimo/gkey/src/texts"
+	"github.com/kevinkassimo/gokey/src/texts"
 )
 
 // From https://siongui.github.io/2016/04/23/go-read-yes-no-from-console/

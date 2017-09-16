@@ -8,7 +8,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/kevinkassimo/gkey/src/confirm"
+	"github.com/kevinkassimo/gokey/src/confirm"
 	"golang.org/x/crypto/bcrypt"
 	"io"
 	"io/ioutil"
@@ -34,7 +34,6 @@ func (e *UserEntry) ReadData() bool {
 		log.Fatalf("User data unmarshalling failed: %s\n", err)
 	}
 
-	fmt.Printf("%s\n", e.Password)
 	if err := bcrypt.CompareHashAndPassword(e.Entry.Hash, e.Password); err != nil {
 		return false // Password validation failed
 	}

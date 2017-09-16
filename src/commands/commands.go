@@ -5,11 +5,12 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/atotto/clipboard"
-	"github.com/kevinkassimo/gkey/src/confirm"
-	"github.com/kevinkassimo/gkey/src/entry"
-	"github.com/kevinkassimo/gkey/src/files"
-	"github.com/kevinkassimo/gkey/src/texts"
+	"github.com/kevinkassimo/gokey/src/confirm"
+	"github.com/kevinkassimo/gokey/src/entry"
+	"github.com/kevinkassimo/gokey/src/files"
+	"github.com/kevinkassimo/gokey/src/texts"
 	"os"
+	"strings"
 )
 
 const (
@@ -61,6 +62,7 @@ func CommandDispatcher(args []string) {
 			// empty
 		}
 	case EXIT:
+		texts.Ok("Goodbye\n")
 		os.Exit(0)
 	case ADD:
 		HandleAdd(args[1:])
@@ -92,7 +94,7 @@ func CommandDispatcher(args []string) {
 
 func HandleLogin() bool {
 	var s string
-	//var err error
+
 	for {
 		texts.Prompt("Login username: ")
 		s = texts.GetLineString(os.Stdin)
@@ -174,7 +176,8 @@ func HandleAdd(args []string) {
 		n = []byte(args[0])
 	} else {
 		texts.Prompt("Name: ")
-		n = texts.GetLineBytes(os.Stdin)
+		// Avoid unexpected space tracing
+		n = texts.GetLineBytesTrimmed(os.Stdin)
 	}
 
 	texts.Prompt("Description: ")
@@ -197,7 +200,9 @@ func HandleRemove(args []string) {
 		PrintHelp()
 		return
 	}
-	DataCache.Entry.RemoveEntry([]byte(args[0]))
+
+	// Avoid unexpected space tracing
+	DataCache.Entry.RemoveEntry([]byte(strings.Trim(args[0], "\t ")))
 	DataCache.WriteData()
 
 	texts.Ok("Removed\n")
@@ -218,6 +223,8 @@ func HandleDestroy() {
 		DataCache = entry.UserEntry{}
 		Users = files.ScanAllUsers()
 
+		texts.Ok("Destroyed\n")
+
 		if len(Users) <= 0 {
 			HandleNewUser()
 			HandleLogin()
@@ -225,8 +232,6 @@ func HandleDestroy() {
 			HandleLogin()
 		}
 	}
-
-	texts.Ok("Destroyed\n")
 }
 
 func HandleLookup(args []string) {
@@ -267,8 +272,8 @@ func HandleList() {
 		formatDetail(ent)
 	}
 	fmt.Println("============")
-
-	fmt.Printf("%v\n", DataCache)
+	fmt.Printf("# entries: ")
+	texts.Ok("%d\n", len(DataCache.Entry.Entries))
 }
 
 func HandleCopy(args []string) {
@@ -294,13 +299,39 @@ func HandleWho() {
 
 func PrintHelp() {
 	fmt.Println(`
-	Usage:
-		blah...
-	`)
+Usage:
+	Command line:
+		gokey -n     create a new user account on startup
+		gokey -h     print usage
+	In program:
+		login       log into another user's account
+		new         create a new user account
+
+		add [NAME]  add a new entry to database
+		del [NAME]  delete an entry from database by NAME
+
+		get NAME    get the password by NAME
+		show NAME   show details of entry by NAME
+		copy NAME   copy password found by NAME to clipboard
+
+		list        list all saved entries
+
+		who         get the current username
+		help        print usage
+
+		clear       clear the current database
+		destroy     delete the user account
+		exit        quit program
+`)
 }
 
 func formatDetail(e entry.PasswordEntry) {
-	fmt.Printf("Name: %s\nDescription: %s\nPassword: %s\n", e.Name, e.Desc, e.Password)
+	fmt.Printf("Name: ")
+	texts.Ok("%s\n", e.Name)
+	fmt.Printf("Description: ")
+	texts.Ok("%s\n", e.Desc)
+	fmt.Printf("Password: ")
+	texts.Ok("%s\n", e.Password)
 }
 
 func checkIfUserExist(name string) bool {

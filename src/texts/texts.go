@@ -6,6 +6,7 @@ import(
 	"bufio"
 	"io"
 	"os"
+	"fmt"
 )
 
 func isWhitespace(r rune) bool {
@@ -53,6 +54,17 @@ func GetLineString(rd io.Reader) string {
 	return readStr[:len(readStr)-1]
 }
 
+func GetLineStringTrimmed(rd io.Reader) string {
+	reader := bufio.NewReader(rd)
+	readStr, err := reader.ReadString('\n')
+	if err != nil {
+		checkEOF(err)
+		panic(err)
+	}
+	readStr = strings.Trim(readStr, "\t ")
+	return readStr[:len(readStr)-1]
+}
+
 func GetLineBytes(rd io.Reader) []byte {
 	reader := bufio.NewReader(rd)
 	readStr, err := reader.ReadString('\n')
@@ -62,9 +74,20 @@ func GetLineBytes(rd io.Reader) []byte {
 	}
 	return []byte(readStr[:len(readStr)-1])
 }
+func GetLineBytesTrimmed(rd io.Reader) []byte {
+	reader := bufio.NewReader(rd)
+	readStr, err := reader.ReadString('\n')
+	if err != nil {
+		checkEOF(err)
+		panic(err)
+	}
+	readStr = strings.Trim(readStr, "\t ")
+	return []byte(readStr[:len(readStr)-1])
+}
 
 func checkEOF(err error) {
 	if err.Error() == "EOF" {
+		fmt.Printf("\n")
 		os.Exit(0)
 	}
 }

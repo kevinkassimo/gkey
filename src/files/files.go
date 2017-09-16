@@ -1,18 +1,41 @@
 package files
 
 import (
-	"fmt"
-	"github.com/kevinkassimo/gkey/src/entry"
+	"github.com/kevinkassimo/gokey/src/entry"
 	"io/ioutil"
 	"log"
 	"os"
+	"os/user"
+)
+
+var (
+	BASE_DIR string
+	USER_DIR string
 )
 
 const (
-	BASE_DIR  = "/usr/local/share/pass"
-	USER_DIR  = "/usr/local/share/pass/users"
+	//BASE_DIR  = "/usr/local/share/pass"
+	//USER_DIR  = "/usr/local/share/pass/users"
 	DATA_JSON = "data.json"
 )
+
+func init() {
+	usr, err := user.Current()
+	if err != nil {
+		panic(err)
+	}
+	BASE_DIR = usr.HomeDir + "/.gokey_store"
+	USER_DIR = usr.HomeDir + "/.gokey_store/users"
+
+	checkDirs()
+}
+
+func checkDirs() {
+	err := os.MkdirAll(USER_DIR, 0770)
+	if err != nil {
+		panic(err)
+	}
+}
 
 func ScanAllUsers() []string {
 	folders, err := ioutil.ReadDir(USER_DIR)
@@ -23,7 +46,6 @@ func ScanAllUsers() []string {
 	userList := []string{}
 
 	for _, folder := range folders {
-		fmt.Printf("%s\n", folder.Name())
 		userList = append(userList, folder.Name())
 	}
 	return userList
