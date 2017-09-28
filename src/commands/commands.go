@@ -5,12 +5,14 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/atotto/clipboard"
+	"github.com/howeyc/gopass"
 	"github.com/kevinkassimo/gokey/src/confirm"
 	"github.com/kevinkassimo/gokey/src/entry"
 	"github.com/kevinkassimo/gokey/src/files"
 	"github.com/kevinkassimo/gokey/src/texts"
 	"os"
 	"strings"
+	"log"
 )
 
 const (
@@ -108,7 +110,11 @@ func HandleLogin() bool {
 	DataCache.Name = s
 
 	texts.Prompt("Login password: ")
-	p := texts.GetLineBytes(os.Stdin)
+	p, err := gopass.GetPasswdMasked()
+	if err != nil {
+		log.Fatalf("Get password error: %s\n", err.Error())
+	}
+	//p := texts.GetLineBytes(os.Stdin)
 	DataCache.Password = p
 
 	result := files.ReadData(&DataCache)
@@ -153,7 +159,11 @@ func HandleNewUser() {
 
 	for {
 		texts.Prompt("New password [AES, must be 16 chars]: ")
-		p := texts.GetLineBytes(os.Stdin)
+		p, err := gopass.GetPasswdMasked()
+		if err != nil {
+			log.Fatalf("Get password error: %s\n", err.Error())
+		}
+		//p := texts.GetLineBytes(os.Stdin)
 		if len(p) != 16 {
 			texts.Error("Password length not valid, must be 16 chars! (AES requirement)\n")
 			continue
@@ -184,7 +194,11 @@ func HandleAdd(args []string) {
 	s := texts.GetLineBytes(os.Stdin)
 
 	texts.Prompt("Password: ")
-	p := texts.GetLineBytes(os.Stdin)
+	p, err := gopass.GetPasswdMasked()
+	if err != nil {
+		log.Fatalf("Get password error: %s\n", err.Error())
+	}
+	//p := texts.GetLineBytes(os.Stdin)
 
 	DataCache.Entry.AddEntry(entry.PasswordEntry{n, s, p})
 
