@@ -25,6 +25,7 @@ const (
 	NEW     = "new"
 	GET     = "get"
 	SHOW    = "show"
+	NAMES   = "names"
 	LIST    = "list"
 	COPY    = "copy"
 	WHO     = "who"
@@ -80,6 +81,8 @@ func CommandDispatcher(args []string) {
 		HandleLookup(args[1:])
 	case SHOW:
 		HandleShowDetail(args[1:])
+	case NAMES:
+		HandleNames()
 	case LIST:
 		HandleList()
 	case COPY:
@@ -280,6 +283,15 @@ func HandleShowDetail(args []string) {
 	texts.Error("Not found\n")
 }
 
+func HandleNames() {
+	for _, ent := range DataCache.Entry.Entries {
+		texts.Ok("%s\n", ent.Name)
+	}
+	fmt.Println("============")
+	fmt.Printf("# entries: ")
+	texts.Ok("%d\n", len(DataCache.Entry.Entries))
+}
+
 func HandleList() {
 	for _, ent := range DataCache.Entry.Entries {
 		fmt.Println("============")
@@ -328,6 +340,7 @@ Usage:
 		show NAME   show details of entry by NAME
 		copy NAME   copy password found by NAME to clipboard
 
+		names       list all entries' names (w/o password)
 		list        list all saved entries
 
 		who         get the current username
