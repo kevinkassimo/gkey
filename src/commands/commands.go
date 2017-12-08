@@ -10,9 +10,9 @@ import (
 	"github.com/kevinkassimo/gokey/src/entry"
 	"github.com/kevinkassimo/gokey/src/files"
 	"github.com/kevinkassimo/gokey/src/texts"
+	"log"
 	"os"
 	"strings"
-	"log"
 )
 
 const (
@@ -229,9 +229,8 @@ func HandleClear() {
 	if confirm.Ask("Clear all data. Are you sure?") {
 		DataCache.Entry.Entries = []entry.PasswordEntry{}
 		DataCache.WriteData()
+		texts.Ok("Cleared\n")
 	}
-
-	texts.Ok("Cleared\n")
 }
 
 func HandleDestroy() {
